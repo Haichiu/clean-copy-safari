@@ -78,6 +78,11 @@ export function cleanURL(input) {
     return { url: input, removed: 0 };
   }
 
+  // A signature covers the resource query: changing even a tracker invalidates it.
+  if ([...parsed.searchParams.keys()].some((key) => ["signature", "x-amz-signature", "x-goog-signature", "sig"].includes(key.toLowerCase()))) {
+    return { url: input, removed: 0 };
+  }
+
   const kept = new URLSearchParams();
   let removed = 0;
 
@@ -89,6 +94,7 @@ export function cleanURL(input) {
     }
   }
 
+  if (removed === 0) return { url: input, removed: 0 };
   parsed.search = kept.toString();
   return { url: parsed.href, removed };
 }
